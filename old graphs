@@ -1,0 +1,47 @@
+	mpl.rcParams['grid.color'] = '#3e3f3f'
+	mpl.rcParams['grid.linestyle'] = ':'
+	mpl.rcParams['grid.linewidth'] = .5
+	
+	d2 = datetime.date.today() #default set as today
+	d1 = d2.replace(year=d2.year-1)	#these should be post/gets eventually so people can change the graph based on the dates they want to analyze, default set at last year today
+	
+	
+	#if np.subtract(d2,d1) > (0,6,0) :			#trying to cut down on labels if the distance between dates is larger than 6 months(otherwise unreadable) 
+		#bigTick = dat.MonthLocator()
+	#else:
+	bigTick = dat.WeekdayLocator(dat.MONDAY)       # major ticks on the mondays
+	#return bigTick
+
+
+	alldays = dat.DayLocator()              # minor ticks on the days
+	weekFormatter = dat.DateFormatter('%b %d')  # e.g., Jan 12
+	dayFormatter = dat.DateFormatter('%d')	
+	try:
+		quotes = mpf.quotes_historical_yahoo_ohlc(stockid, d1, d2)
+	
+		fig, ax = plt.subplots(figsize=(10,5)) #this is in x in so, need to determine users screen size and base it off that?
+		fig.subplots_adjust(bottom=0.2)
+		ax.xaxis.set_major_locator(bigTick)
+		ax.xaxis.set_minor_locator(alldays)
+		ax.xaxis.set_major_formatter(weekFormatter)
+		ax.set_title(stockid)
+		ax.grid(True)
+		ax.set_xlabel('Date')
+		ax.set_ylabel('Ticker Price (USD)')
+		ax.yaxis.label.set_color('#000000')
+		ax.title.set_color('#000000') #bdbdbd
+		ax.xaxis.label.set_color('#000000')
+		ax.set_facecolor("#1F1F1F")
+		ax.title.set_size(35)
+		ax.xaxis.label.set_size(25)
+		ax.yaxis.label.set_size(25)
+		points = mpf.candlestick_ohlc(ax, quotes, width=0.6, colorup='#009900', colordown='#EE3524')
+
+		ax.xaxis_date()
+		ax.autoscale_view()
+		plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+		mpld3.plugins.connect(fig, mpld3.plugins.MousePosition(fontsize='30')) #also fails, supposed to show tooltip coords, or mousecoords, both fail? http://mpld3.github.io/modules/API.html
+		return mpld3.fig_to_html(fig)
+		plt.gcf().clear()
+	except:
+		return "That ticker doesn't exist"

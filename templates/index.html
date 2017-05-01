@@ -1,0 +1,360 @@
+<!--Needs to be before the header, or all the way at bottom-->
+<div data-role='page'>
+<div data-role='header'>
+        <h1>myStock</h1>
+        <a href='#navbar' data-icon='bars' data-iconpos='notext'>Menu</a>
+        <a href='#newsbar' data-icon='info' data-iconpos='notext'>Menu2</a>
+    </div>
+
+<!HTML>
+<html>
+<!--Header-->
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>myStock</title>
+<!--Jquery Mobile-->
+<link rel='stylesheet' href="{{url_for('static', filename='themes/themes/default.min.css') }}" />
+<link rel='stylesheet' href="{{url_for('static', filename='themes/themes/jquery.mobile.icons.min.css') }}" />
+<link rel='stylesheet' href="{{url_for('static', filename='themes/jquery.mobile.structure-1.4.5.min.css') }}" />
+<!--Jquery UI-->
+<link rel='stylesheet' href="{{url_for('static', filename='themes/jqueryui/jquery-ui.min.css') }}" />
+<link rel='stylesheet' href="{{url_for('static', filename='themes/jqueryui/jquery-ui.structure.min.css') }}" />
+<link rel='stylesheet' href="{{url_for('static', filename='themes/jqueryui/jquery-ui.theme.min.css') }}" />
+<!--Other-->
+<link rel='stylesheet' href="{{url_for('static', filename='themes/bokeh-0.12.0.min.css') }}" />
+<link rel='stylesheet' href="{{url_for('static', filename='passfield-1.1.13/css/passfield.css') }}" />
+<!--JS files-->
+<script src="{{url_for('static', filename='jquery-1.11.1.min.js') }}"></script>
+<script src="{{url_for('static', filename='themes/jqueryui/jquery-ui.js') }}"></script>
+<script src="{{url_for('static', filename='jquerymob.js') }}"></script>
+<script src="{{url_for('static', filename='bokeh-0.12.0.min.js') }}"></script>
+<script src="{{url_for('static', filename='passfield-1.1.13/js/passfield.js') }}"></script>
+<script src="{{url_for('static', filename='passfield-1.1.13/js/locales.js') }}"></script>
+<div  style='background-color:#2E3192;' data-role='panel' data-display='push' id='navbar'>
+        <ul data-role='listview' id='rnav'>
+				<li  style='background-color:#2E3192'><input type="search" name="search" id="search" data-mini='true' placeholder="Search..."  /></li>
+                <li data-icon='home'><a id='0' data-rel='close'>Home</a></li>
+				<li id='logm' class='lout'><a style='background-color:#2E3192;' data-rel='close'>Login</a></li>
+				<li id='regm' class='lout'><a style='background-color:#2E3192;' data-rel='close'>Register</a></li>
+				<li id='logom' class='lin'><a style='background-color:#2E3192;' data-rel='close'>Logout</a></li>
+                <li id='fav' class='lin'><a style='background-color:#2E3192;' data-rel='close'>Favorites</a></li>
+                <li id='rec' class='lin'><a style='background-color:#2E3192;' data-rel='close'>Recents</a></li>
+        </ul>
+
+    </div>
+
+<div style='background-color:#2E3192' data-role='panel' data-display='overlay' data-position='right' id='newsbar'>
+        <ul data-role='listview' id='right'>
+				<li style='background-color:#2E3192;color:white;' id='headfin'>Recent Finance Updates</li>
+        </ul>
+    </div>
+
+<!--End Header-->
+<body>
+<div role='content' id='m' style='text-align:center;' class='ui-content jqm-content jqm-fullwidth'>
+
+<div id='loginpage' data-dismissible='false' data-role='popup'>
+<a href="#" id='logclose' data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<form id='logf'>
+				<div style="padding:10px 20px;">
+				  <h3>Sign In</h3>
+		          <label for="email" class="ui-hidden-accessible">E-mail:</label>
+		          <input type="email" name="email" id="email" value="" placeholder="E-mail" />
+
+		          <label for="pw" class="ui-hidden-accessible">Password:</label>
+		          <input type="password" name="pw" id="pw" value="" placeholder="Password" />
+
+		    	  <button id='signin' type="button" data-inline='true'>Sign in</button>
+				  <input type='reset' value='Reset' data-inline='true'/>
+				  <div id='logload'></div>
+				</div>
+			</form>
+</div>
+
+<div id='regpage' data-role='popup' data-dismissible='false'>
+<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<form id='regf'>
+				<div style="padding:10px 20px;">
+				  <h3>Register</h3>
+		          <label for="email" class="ui-hidden-accessible">E-mail:</label>
+		          <input type="email" name="email" id="email" value="" placeholder="E-mail" />
+		          <label for="pw1" class="ui-hidden-accessible">Password:</label>
+		          <input type="password" name="pw1" id="pw1" value="" placeholder="Password" />
+		    	  <button  id='regcomplete' type="button" data-inline='true'>Register</button>
+				  <input type='reset' value='Reset' data-inline='true'/>
+				  <div id='regload'></div>
+				</div>
+			</form>
+</div>
+
+<div class='ui-body' id='main'>
+ <div id="tabs">
+  <ul id='tab'>
+    <li id='home'><a id='mtab' href="#index">Home</a></li>
+  </ul>
+  <div id='favload' class='ui-content' data-role='popup' data-transition='fade' data-position-to='origin'></div>
+  
+  <div id='datepickload' class='ui-content' data-role='popup' datatransition='fade' data-position-to='origin'>	
+	<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+	<form id='dpf'>
+	<label for="from">Start:</label>
+	<input type="month" id="from" name="from">		<!--if dev continues, I'd probably move this over to jQuery since HTML5 kinda new still-->
+	<label for="to">End:</label>
+	<input type="month" id="to" name="to">
+	<button id='change' type="button" data-inline='true'>Change</button>
+	<input type='reset' value='Reset' data-inline='true'/>
+	</form>
+  </div>
+  
+<div style='padding-top:1%;display:none;' id='favbar' data-role="controlgroup" data-type="horizontal" data-mini="true">
+    <a href="#" id='favb' class="lin ui-shadow ui-btn ui-corner-all ui-btn-icon-left ui-icon-star ui-btn-b">Favorite</a>
+    <a href="#" id='unfavb' class="lin ui-shadow ui-btn ui-corner-all ui-btn-icon-left ui-icon-minus ui-btn-c">Unfavorite</a>
+    <a href="#" id='datepick' class="ui-shadow ui-btn ui-corner-all ui-btn-icon-left ui-icon-calendar ui-btn">Change Dates</a>
+</div>
+  <div id='index'>Welcome to myStock. You can check your favorites right from here, or on your sidebar. <br />
+  <a id='lopen' class='lout' data-position-to='window'  data-transition='slidedown' data-inline='true' href='#loginpage' data-rel='popup' data-role='button'>Login</a>
+  <a id='ropen' class='lout' data-position-to='window' data-inline='true' data-transition='flow' href='#regpage' data-rel='popup' data-role='button'>Register</a>
+  <a id='loopen' class='lin' data-role='button' data-inline='true'>Logout</a>
+  </div>
+</div> <!--Tabs-->
+
+</div> <!--Ui-Body-->
+</div> <!--Content Div-->
+<div data-role='footer' data-position='fixed'>
+		<h1>SSW215 2017 Final Project</h1>
+	</div>
+</div>
+<div style='display:none;' id='logoutload'></div>
+</body>
+<!--jQuery requires this to be below the actual HTML-->
+<script>
+var ftickers = {{ favs|tojson }}; //variables for all of JS
+var titleA = {{ titleA|tojson }};
+var recents = {{ recent|tojson }};
+var d = new Date();
+var y2 = d.getFullYear();	//date for graphs
+var y1 = y2 - 1;
+var y4;
+var y3;
+var m1 = d.getMonth();
+var m2 = m1;
+var m3;
+var m4;
+var id = 0;		//often set/reset in each func
+var tabID = 0;
+var tid;
+var i = 0;
+var y = 0;
+var z = 0;
+var temp;
+var loginCheck = {{ logcheck }};
+var passF = $("#pw1").passField();
+
+titleA.forEach(function(x){ //makes tabs for each ticker 
+	z++;
+	temp = x[1].split("http")[3].replace(/%3a/i, '');
+	$("<li><a href='" + temp + "' data-rel='close'>" + x[0] + "</a></li>").insertAfter('ul#right li#headfin');
+});
+
+
+if(loginCheck != 0) { //checks if logged in
+$(".lout").css({"display": "none"});
+
+ftickers.forEach(function(x){ //makes tabs for each ticker 
+	i++;
+	$("<li data-icon='star'><a class='menu' id='" + x + "' data-rel='close'>" + x + "</a></li>").insertAfter('ul#rnav li#fav');
+	if(i <= 5) {
+	$("<li><a id='" + x + "' href='stock/" + x + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "&m2=" + m2 + "'>" + x + "</a><span id='xout' class='ui-icon ui-icon-close' role='presentation'>Delete Tab</span></li>").insertAfter('div#m div#main div#tabs ul#tab li#home');
+}
+});
+
+recents.forEach(function(x){ //makes tabs for each ticker 
+	y++;
+	$("<li data-icon='back'><a class='menu' id='" + x + "' data-rel='close'>" + x + "</a></li>").insertAfter('ul#rnav li#rec');
+});
+$("a.menu").click(function(){		//menu stock links
+id = $(this).attr('id');
+	if(document.getElementById(id) == '') {
+		$("<li id='" + id + "'><a id='" + id + "' href='stock/" + id + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "&m2=" + m2 + "'>" + id + "</a><span id='xout' class='ui-icon ui-icon-close' role='presentation'>Delete Tab</span></li>").insertAfter('div#m div#main div#tabs ul#tab li#home');
+		$("#tabs").tabs("refresh"); 
+		$("#tabs").tabs("option","active", 1); 
+	  } else {
+		var i = $("#tabs a[href='stock/" + id + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "']").parent().index();
+		$("#tabs").tabs("option", "active", i);
+	  }
+});
+
+$("#favb").click(function() {	//adds to favorites and brings a lil popup guy that leaves after 2s
+	tid = $("#tabs .ui-tabs-panel:visible").attr("aria-labelledby");
+	$.post("/favs", { ticker: tid, type: "fav" }, function(data) {
+		$("#favload").css({"background-color": "#FFFFD5"}).trigger('create');
+		$("#favload").html(data).trigger('create');
+		$("#favload").popup("open").trigger('create');
+		});
+	setTimeout(function() {$("#favload").popup("close")}, 2000);
+});
+
+$("#unfavb").click(function() {		//removes from favorites and brings a lil popup guy that leaves after 2s
+	tid = $("#tabs .ui-tabs-panel:visible").attr("aria-labelledby");
+	$.post("/favs", { ticker: tid, type: "ufav" }, function(data) {
+		$("#favload").css({"background-color": "#ff9b9b"}).trigger('create');
+		$("#favload").html(data).trigger('create');
+		$("#favload").popup("open").trigger('create');
+		});
+	setTimeout(function() {$("#favload").popup("close")}, 2000);
+});
+
+function logout() {		//sets the logout function so it is callable from main button or sidebar
+	$("#logoutload").load("/logout", function() {
+		location.reload(true);
+	});
+}
+
+$("a#loopen").click(function(){	//main logout button
+logout();
+});
+
+$("#logom").click(function() { //sidebar logout
+logout();
+});
+
+} //ends login check funcs
+
+$("#datepick").click(function() {	//datepicker popup
+	tid = $("#tabs .ui-tabs-panel:visible").attr("aria-labelledby");
+	$("#datepickload").popup("open");
+});
+
+$("#change").click(function(){	//change date month/year only
+var to = document.getElementById('to').value.split('-');
+var fromv = document.getElementById('from').value.split('-'); //start
+tid = $("#tabs .ui-tabs-panel:visible").attr("aria-labelledby");
+var ftid = $("#tabs .ui-tabs-panel:visible").attr("id");
+if ( !!to.valueOf() && !!fromv.valueOf()) { //dates exist
+    m4 = parseInt(to[1]) - 1;
+    y4 = to[0];
+	m3 = parseInt(fromv[1]) - 1;
+	y3 = fromv[0];
+	if(y3 < 1602) {		//really old dates, just sets it to 1602 which was first stock market ever 
+		y3 = 1602;
+	} 
+	if(y4 < y2) {		//really future dates, sets it to this year
+		y4 = y2;
+	}
+	if(y4 == y2 && m4 > m1) {	//future month this year that hasnt happened, changes it to this month
+		m4 = m1
+	}
+	if(y3 > y4) {		//2nd year bigger than first, swaps
+	temp = y3
+	y3 = y4
+	y3 = temp
+	}
+	if(y3 == y4 && m3 > m4) {		//year same, 2nd month bigger than first, swaps
+	temp = m3
+	m3 = m4
+	m4 = temp
+	}
+	if(m1 == m2) {
+		m2 = m1 + 1;
+	}
+	$("#datepickload").popup("close");
+	$("#" + ftid).load("stock/" + tid + "?y1=" + y3 + "&y2=" + y4 + "&m1=" + m3 + "&m2=" + m4)
+} else {  //bad date
+	m3 = m1;
+	m4 = m2;
+	y3 = y1;
+	y4 = y2;
+}
+});
+
+$( function() {		//tabs
+    $("#tabs").tabs({
+	create: function(event,ui) {
+	tabID = $("#tabs .ui-tabs-panel:visible").attr("id");
+	if(tabID == 'index') {
+		$("#favbar").css({"display": "none"});
+	} else {
+		$("#favbar").css({"display": "block", "padding-top": "1%", "padding-bottom": "0%"});
+	}
+	},
+      beforeLoad: function(event,ui) {
+	  $.mobile.loading('show');
+		  if ($(ui.panel).html()) {    // If content is there, it won't reload (cached basically, save bandwidth/faster)
+            event.preventDefault();     
+        }
+      },
+	   activate: function() { 
+	   	tabID = $("#tabs .ui-tabs-panel:visible").attr("id");
+	if(tabID == 'index') {
+		$("#favbar").css({"display": "none"});
+	} else {
+		$("#favbar").css({"display": "block", "padding-top": "1%", "padding-bottom": "0%"});
+	}
+	$.mobile.loading('hide');
+		}, 
+    });
+  });
+  
+$(document).ready(function(){
+$("#search").keypress(function(e){		//search
+var key = e.which;
+id = $("#search").val();
+	if(key == 13) {
+		if(document.getElementById(id) == null || document.getElementById(id) == '') {
+	$("<li id='" + id + "'><a id='" + id + "' href='stock/" + id + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "&m2=" + m2 + "'>" + id + "</a><span id='xout' class='ui-icon ui-icon-close' role='presentation'>Delete Tab</span></li>").insertAfter('div#m div#main div#tabs ul#tab li#home');
+		$("#tabs").tabs("refresh");
+	$("#tabs").tabs("option", "active", 1); 
+	  } else {
+		var i = $("#tabs a[href='stock/" + id + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "&m2=" + m2 + "']").parent().index();
+		$("#tabs").tabs("option", "active", i);
+	  }
+		$("#search").val("");
+		$("#navbar").panel("close");
+	  }
+});
+
+$("#tabs").tabs().on("click", "span#xout", function() {			//lets you close out tabs
+	  var panelId = $(this).closest("li").remove().attr("aria-controls");
+      $("#" + panelId).remove();
+      $("#tabs").tabs("refresh");
+    });
+
+if(loginCheck == 0) { //if logged out
+$(".lin").css({"display": "none"});
+$("#signin").click(function(){        	//signin + reloads page
+$.post("/login", $("#logf").serialize(), function(data) {
+		if(data == "logged") {
+		document.getElementById('logclose').click();
+		setTimeout(function(){location.reload()}, 1)
+		} else {
+			$("#logload").html(data).trigger('create');
+			$("#loginpage").popup("open").trigger('create');
+		}
+    });
+});
+
+$("#logm").click(function(){        	//loads login popup from sidebar
+    $("#loginpage").popup("open");
+});
+
+$("#regcomplete").click(function(){    //register + closeout   
+if(passF.getPassStrength() == 1) {
+ $.post("/register", $("#regf").serialize(), function(data) {
+        $("#regload").html(data).trigger('create');
+		$("#regpage").popup("open").trigger('create');
+		if(data == "registered") {
+			$("#regload").html('').trigger('create');
+			$("#regpage").popup("close");
+		}
+    });
+	}
+});
+
+$("#regm").click(function(){     //register popup load from sidebar
+	$("#regpage").popup("open");
+});
+
+}
+});
+</script>
+</html>
