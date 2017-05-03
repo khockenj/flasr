@@ -152,10 +152,10 @@ var passF = $("#pw1").passField();
 
 titleA.forEach(function(x){ //makes tabs for each ticker 
 	z++;
-	temp = x[1].split("http")[3].replace(/%3a/i, '');
+	//temp = x[1].split("http")[3].replace(/%3a/i, ''); Links are weird, they had them formatted really weird the first time
+	temp = x[1];
 	$("<li><a href='" + temp + "' data-rel='close'>" + x[0] + "</a></li>").insertAfter('ul#right li#headfin');
 });
-
 
 if(loginCheck != 0) { //checks if logged in
 $(".lout").css({"display": "none"});
