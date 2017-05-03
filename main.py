@@ -156,47 +156,47 @@ def stocks(stockid):
 	cur = dbconn.cursor()
 	sid = session.get('uid');
 	
-	#try:
-	url = "http://ichart.yahoo.com/table.csv?s=" + stockid + "&a=" + m1 + "&b=01&c=" + y1 + "&d=" + m2 + "&e=01&f=" + y2	#pulls numbers for graphs from icharts with fill-in-the-blanks
-	stock = pd.read_csv(url, parse_dates=['Date'])	#parses data by date
-	title = stockid + " Price (USD)"	#graph title
-	data = dict([
-		(stockid, stock['Adj Close']),
-		('Date', stock['Date'])
-	])
+	try:
+		url = "http://ichart.yahoo.com/table.csv?s=" + stockid + "&a=" + m1 + "&b=01&c=" + y1 + "&d=" + m2 + "&e=01&f=" + y2	#pulls numbers for graphs from icharts with fill-in-the-blanks
+		stock = pd.read_csv(url, parse_dates=['Date'])	#parses data by date
+		title = stockid + " Price (USD)"	#graph title
+		data = dict([
+			(stockid, stock['Adj Close']),
+			('Date', stock['Date'])
+		])
 	
-	hover = bokeh.models.HoverTool(		#this creates tooltips, and this is for the price (y-axis), the dates are not all there so don't bother with dates
-		tooltips=[
-			("Price", "$y USD"),
-		]
-	)
+		hover = bokeh.models.HoverTool(		#this creates tooltips, and this is for the price (y-axis), the dates are not all there so don't bother with dates
+			tooltips=[
+				("Price", "$y USD"),
+			]
+		)
 
-	total = 0
-	for z in range(5):
-		total = total + stock['Adj Close'][z]	#calculates 5day average and if average>current, it's obviously decreasing, average<current, increasing
+		total = 0
+		for z in range(5):
+			total = total + stock['Adj Close'][z]	#calculates 5day average and if average>current, it's obviously decreasing, average<current, increasing
 		 
-	if(stock['Adj Close'][0] <= total/5):
-		fcolor = "#DE2D26"
-	else:
-		fcolor = "#31A354"
+		if(stock['Adj Close'][0] <= total/5):
+			fcolor = "#DE2D26"
+		else:
+			fcolor = "#31A354"
 		
-	if sid:
-		select = cur.execute("SELECT COUNT(*) FROM `favs` WHERE `ownerid` = ? AND `ticker` = ?", (sid, stockid))
-		fetcher = select.fetchone()
-		if fetcher[0] == 0:	#checks for fav/recent of this ticker already
-			sel = cur.execute("SELECT COUNT(*) FROM `favs` WHERE `ownerid` = ? AND `type` = ?", (sid, 1))		#recents, if over 5 deletes oldest.
-			fet = sel.fetchone()
-			if fet[0] >= 5: #total recents >= 5 make room for new. 
-				deleteU = cur.execute("DELETE FROM `favs` WHERE `fid` = (SELECT MIN(fid) FROM `favs` WHERE `ownerid` = (?) AND `type` = (?))", (sid, 1))
+		if sid:
+			select = cur.execute("SELECT COUNT(*) FROM `favs` WHERE `ownerid` = ? AND `ticker` = ?", (sid, stockid))
+			fetcher = select.fetchone()
+			if fetcher[0] == 0:	#checks for fav/recent of this ticker already
+				sel = cur.execute("SELECT COUNT(*) FROM `favs` WHERE `ownerid` = ? AND `type` = ?", (sid, 1))		#recents, if over 5 deletes oldest.
+				fet = sel.fetchone()
+				if fet[0] >= 5: #total recents >= 5 make room for new. 
+					deleteU = cur.execute("DELETE FROM `favs` WHERE `fid` = (SELECT MIN(fid) FROM `favs` WHERE `ownerid` = (?) AND `type` = (?))", (sid, 1))
 
+					dbconn.commit()
+				insertU = cur.execute("INSERT INTO `favs` (ownerid, ticker, type) VALUES (?, ?, ?)", (sid, stockid, 1))
 				dbconn.commit()
-			insertU = cur.execute("INSERT INTO `favs` (ownerid, ticker, type) VALUES (?, ?, ?)", (sid, stockid, 1))
-			dbconn.commit()
 			
-	inlineResources = bokeh.resources.Resources(mode='inline') #this fixes the issue of the first graph not loading, since it was loading it's resources from the CDN and not from the site itself
+		inlineResources = bokeh.resources.Resources(mode='inline') #this fixes the issue of the first graph not loading, since it was loading it's resources from the CDN and not from the site itself
 		#og color:#006400, my color = #31A354
-	hp = Horizon(data, x='Date', toolbar_location='above', num_folds=1, pos_color=fcolor, tools=[hover, bokeh.models.ResetTool(), bokeh.models.BoxZoomTool(), bokeh.models.PanTool(), bokeh.models.ResizeTool(), bokeh.models.WheelZoomTool()], plot_width=800, plot_height=300, responsive=True, title=title)
-	return file_html(hp, inlineResources, "myStock")	#needs inline resources to load on intial load, and it renames the page so we just keep it the same with "myStock"
-	#except:
-		#return "This  ticker doesn't exist"
+		hp = Horizon(data, x='Date', toolbar_location='above', num_folds=1, pos_color=fcolor, tools=[hover, bokeh.models.ResetTool(), bokeh.models.BoxZoomTool(), bokeh.models.PanTool(), bokeh.models.ResizeTool(), bokeh.models.WheelZoomTool()], plot_width=800, plot_height=300, responsive=True, title=title)
+		return file_html(hp, inlineResources, "myStock")	#needs inline resources to load on intial load, and it renames the page so we just keep it the same with "myStock"
+	except:
+		return "This  ticker doesn't exist"
 	
