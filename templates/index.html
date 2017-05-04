@@ -128,11 +128,11 @@
 </body>
 <!--jQuery requires this to be below the actual HTML-->
 <script>
-var ftickers = {{ favs|tojson }}; //variables for all of JS
-var titleA = {{ titleA|tojson }};
-var recents = {{ recent|tojson }};
+var ftickers = {{ favs|tojson }}; //fav'd tickers
+var titleA = {{ titleA|tojson }}; //titles/urls of RSS feed
+var recents = {{ recent|tojson }}; //recent tickers
 var d = new Date();
-var y2 = d.getFullYear();	//date for graphs
+var y2 = d.getFullYear();	//dates for graphs (y2 - m4)
 var y1 = y2 - 1;
 var y4;
 var y3;
@@ -142,44 +142,43 @@ var m3;
 var m4;
 var id = 0;		//often set/reset in each func
 var tabID = 0;
+var i = 0, i2 = 0, i3 = 0;
 var tid;
-var i = 0;
-var y = 0;
-var z = 0;
 var temp;
 var loginCheck = {{ logcheck }};
 var passF = $("#pw1").passField();
 
 titleA.forEach(function(x){ //makes tabs for each ticker 
-	z++;
+	i++;
 	//temp = x[1].split("http")[3].replace(/%3a/i, ''); Links are weird, they had them formatted really weird the first time
 	temp = x[1];
 	$("<li><a href='" + temp + "' data-rel='close'>" + x[0] + "</a></li>").insertAfter('ul#right li#headfin');
 });
 
 if(loginCheck != 0) { //checks if logged in
-$(".lout").css({"display": "none"});
+$(".lout").css({"display": "none"});	//all lout class hidden
 
 ftickers.forEach(function(x){ //makes tabs for each ticker 
-	i++;
+	i2++;
 	$("<li data-icon='star'><a class='menu' id='" + x + "' data-rel='close'>" + x + "</a></li>").insertAfter('ul#rnav li#fav');
-	if(i <= 5) {
+	if(i2 <= 5) {
 	$("<li><a id='" + x + "' href='stock/" + x + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "&m2=" + m2 + "'>" + x + "</a><span id='xout' class='ui-icon ui-icon-close' role='presentation'>Delete Tab</span></li>").insertAfter('div#m div#main div#tabs ul#tab li#home');
 }
 });
 
 recents.forEach(function(x){ //makes tabs for each ticker 
-	y++;
+	i3++;
 	$("<li data-icon='back'><a class='menu' id='" + x + "' data-rel='close'>" + x + "</a></li>").insertAfter('ul#rnav li#rec');
 });
+
 $("a.menu").click(function(){		//menu stock links
 id = $(this).attr('id');
-	if(document.getElementById(id) == '') {
+	if(document.getElementById(id) == '') {	//it it doesnt already exist
 		$("<li id='" + id + "'><a id='" + id + "' href='stock/" + id + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "&m2=" + m2 + "'>" + id + "</a><span id='xout' class='ui-icon ui-icon-close' role='presentation'>Delete Tab</span></li>").insertAfter('div#m div#main div#tabs ul#tab li#home');
 		$("#tabs").tabs("refresh"); 
 		$("#tabs").tabs("option","active", 1); 
-	  } else {
-		var i = $("#tabs a[href='stock/" + id + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "']").parent().index();
+	  } else {	//..if it does
+		var i = $("#tabs a[href='stock/" + id + "?y1=" + y1 + "&y2=" + y2 + "&m1=" + m1 + "&m2=" + m2 + "']").parent().index();
 		$("#tabs").tabs("option", "active", i);
 	  }
 });
@@ -320,7 +319,7 @@ $("#tabs").tabs().on("click", "span#xout", function() {			//lets you close out t
     });
 
 if(loginCheck == 0) { //if logged out
-$(".lin").css({"display": "none"});
+$(".lin").css({"display": "none"});		//lin class hidden
 $("#signin").click(function(){        	//signin + reloads page
 $.post("/login", $("#logf").serialize(), function(data) {
 		if(data == "logged") {
